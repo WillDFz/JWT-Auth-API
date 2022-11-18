@@ -59,7 +59,48 @@ app.post("/auth/register", async (req, res) => {
     }
 });
 
+app.post("/auth/login", async (req, res) => {
+    const { email, password } = req.body;
 
+    // validations
+    if (!email) {
+        return res.status(422).json({ Erro: "E-mail obrigatório" });
+    }
+    if (!password) {
+        return res.status(422).json({ Erro: "Senha obrigatória" });
+    }
+    // Check if user exists
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+        return res.status(404).json({ Erro: "Usuário não encontrado" });
+    }
+
+    // Check if password match
+    const checkPassword = await bcrypt.compare(password, user.password);
+
+    if (!checkPassword) {
+        return res.status(422).json({ Erro: "Senha inválida" });
+    }
+
+    try {
+        const secret = process.env.SECRET;
+        const token = jwt.sign(
+            {
+                id: user._id,
+            },
+            secret
+        );
+
+        res.status(200).json({
+            Mgs: "Autenticação realizada com sucesso",
+            token,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ Erro: "Server error" });
+    }
+});
 
 // Credentials
 const dbUser = process.env.DB_USER;
