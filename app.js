@@ -52,12 +52,14 @@ app.post("/auth/register", async (req, res) => {
     const user = new User({ name, email, password: passwordHash });
 
     try {
-        await user.save()
-        res.status(201).json({Msg: "Usuário criado com sucesso"})
+        await user.save();
+        res.status(201).json({ Msg: "Usuário criado com sucesso" });
     } catch (error) {
-        res.status(500).json({Erro: "error"})
+        res.status(500).json({ Erro: "error" });
     }
 });
+
+
 
 // Credentials
 const dbUser = process.env.DB_USER;
